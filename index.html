@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVAFAN // NERV ARCHIVE & DISCUSSION TERMINAL</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Space Grotesk, Inter, JetBrains Mono for authentic technical Evangelion typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        eva: {
+                            bg: '#09090B',       // Deep obsidian black
+                            surface: '#111114',  // Panel dark gray
+                            elevated: '#18181D', // Elevated card surface
+                            border: '#27272A',   // Crisp structural border
+                            orange: '#FF5500',   // MAGI / Unit-02 / Warning Orange
+                            orangeHover: '#E04B00',
+                            green: '#00FF66',    // MAGI Sync / Unit-01 Neon Green
+                            purple: '#7C3AED',   // Unit-01 Accent
+                            text: '#F4F4F5',     // Crisp off-white
+                            muted: '#A1A1AA'     // Technical gray
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Strict Zero Border-Radius Enforcement & Custom Evangelion Terminal Styling */
+        * {
+            border-radius: 0px !important;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #09090B;
+            color: #F4F4F5;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(to right, rgba(39, 39, 42, 0.25) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(39, 39, 42, 0.25) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Subtle scanline overlay for MAGI terminal vibe */
+        .magi-grid-bg {
+            background-image: radial-gradient(rgba(255, 85, 0, 0.08) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+
+        /* Diagonal hazard stripes (Evangelion signature detail) */
+        .hazard-bar {
+            background: repeating-linear-gradient(
+                -45deg,
+                #FF5500,
+                #FF5500 8px,
+                #09090B 8px,
+                #09090B 16px
+            );
+        }
+
+        /* Chamfered corner accent on hero badge */
+        .cut-corner {
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #09090B;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272A;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FF5500;
+        }
+
+        /* Smooth fade transition for views */
+        .fade-in {
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-eva-orange selection:text-black">
+
+    <!-- Top Hazard Accent Line -->
+    <div class="h-1.5 w-full hazard-bar"></div>
+
+    <!-- Header / Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-eva-bg/95 backdrop-blur border-b border-eva-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Logo -->
+                <a href="#top" onclick="navigateTo('all')" class="flex items-center gap-3 group focus:outline-none">
+                    <div class="w-8 h-8 bg-eva-orange text-black font-mono font-bold text-sm flex items-center justify-center tracking-tighter group-hover:bg-eva-green transition-colors">
+                        01
+                    </div>
+                    <div>
+                        <span class="font-display font-bold text-xl tracking-wider uppercase text-white block leading-none">
+                            EVAFAN
+                        </span>
+                        <span class="font-mono text-[10px] text-eva-orange tracking-widest uppercase block mt-0.5">
+                            MAGI.SYS // ARCHIVE
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-1">
+                    <button onclick="scrollToSection('discussions')" class="nav-btn px-4 py-2 font-mono text-xs uppercase tracking-wider text-eva-muted hover:text-white hover:bg-eva-surface border border-transparent hover:border-eva-border transition-all">
+                        [01] DISCUSSIONS
+                    </button>
+                    <button onclick="scrollToSection('characters')" class="nav-btn px-4 py-2 font-mono text-xs uppercase tracking-wider text-eva-muted hover:text-white hover:bg-eva-surface border border-transparent hover:border-eva-border transition-all">
+                        [02] PERSONNEL DOSSIERS
+                    </button>
+                    <button onclick="scrollToSection('videos')" class="nav-btn px-4 py-2 font-mono text-xs uppercase tracking-wider text-eva-muted hover:text-white hover:bg-eva-surface border border-transparent hover:border-eva-border transition-all">
+                        [03] VIDEO ANALYSIS
+                    </button>
+                </nav>
+
+                <!-- Sync Status Indicator & Mobile Menu Trigger -->
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-eva-surface border border-eva-border">
+                        <span class="w-2 h-2 bg-eva-green animate-pulse"></span>
+                        <span class="font-mono text-[11px] text-eva-green tracking-wider">SYNC RATIO: 98.4%</span>
+                    </div>
+                    <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle Menu" class="md:hidden p-2.5 bg-eva-surface border border-eva-border text-white hover:border-eva-orange focus:outline-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-eva-surface border-b border-eva-border">
+            <div class="px-4 py-3 space-y-2">
+                <button onclick="scrollToSection('discussions'); toggleMobileMenu()" class="block w-full text-left px-3 py-3 font-mono text-xs uppercase tracking-wider text-white bg-eva-bg border border-eva-border hover:border-eva-orange">
+                    [01] DISCUSSIONS & THEORIES
+                </button>
+                <button onclick="scrollToSection('characters'); toggleMobileMenu()" class="block w-full text-left px-3 py-3 font-mono text-xs uppercase tracking-wider text-white bg-eva-bg border border-eva-border hover:border-eva-orange">
+                    [02] PERSONNEL & PILOT FACTS
+                </button>
+                <button onclick="scrollToSection('videos'); toggleMobileMenu()" class="block w-full text-left px-3 py-3 font-mono text-xs uppercase tracking-wider text-white bg-eva-bg border border-eva-border hover:border-eva-orange">
+                    [03] YOUTUBE ANALYSIS ARCHIVE
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="top" class="flex-grow">
+        
+        <!-- HERO SECTION -->
+        <section class="relative border-b border-eva-border magi-grid-bg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    
+                    <!-- Left Hero Typography -->
+                    <div class="lg:col-span-8 space-y-6">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-eva-orange/10 border border-eva-orange text-eva-orange font-mono text-xs uppercase tracking-widest cut-corner">
+                            <span>TERMINAL ACCESS // TOKYO-3</span>
+                        </div>
+                        
+                        <h1 class="font-display font-bold text-4xl sm:text-5xl md:text-6xl uppercase tracking-tight leading-[1.05] text-white">
+                            DECODING THE <span class="text-eva-orange">INSTRUMENTALITY</span> ARCHIVE.
+                        </h1>
+                        
+                        <p class="text-eva-muted text-base sm:text-lg max-w-2xl leading-relaxed">
+                            Welcome to <strong class="text-white">evafan</strong> — a dedicated tactical database for Neon Genesis Evangelion enthusiasts. Analyze character lore, debate lore theories on the MAGI board, and share deep-dive YouTube video essays directly inside our embedded theater.
+                        </p>
+
+                        <div class="flex flex-wrap gap-3 pt-2">
+                            <button onclick="scrollToSection('videos')" class="px-6 py-3.5 bg-eva-orange hover:bg-eva-orangeHover text-black font-mono font-bold text-xs uppercase tracking-wider transition-colors flex items-center gap-2">
+                                <span>WATCH & SUBMIT VIDEO</span>
+                                <span>→</span>
+                            </button>
+                            <button onclick="scrollToSection('discussions')" class="px-6 py-3.5 bg-eva-surface hover:bg-eva-elevated text-white border border-eva-border hover:border-eva-orange font-mono text-xs uppercase tracking-wider transition-colors">
+                                JOIN MAGI DISCUSSION
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right Hero Telemetry Box -->
+                    <div class="lg:col-span-4 bg-eva-surface border border-eva-border p-5 sm:p-6 space-y-4">
+                        <div class="flex items-center justify-between border-b border-eva-border pb-3">
+                            <span class="font-mono text-xs text-eva-orange uppercase tracking-widest">SYSTEM TELEMETRY</span>
+                            <span class="font-mono text-[11px] text-eva-muted">REF: NERV-09</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-eva-bg p-3 border border-eva-border">
+                                <span class="font-mono text-[10px] text-eva-muted uppercase block">ACTIVE THREADS</span>
+                                <span id="stat-posts" class="font-display font-bold text-2xl text-white mt-1 block">0</span>
+                            </div>
+                            <div class="bg-eva-bg p-3 border border-eva-border">
+                                <span class="font-mono text-[10px] text-eva-muted uppercase block">INDEXED VIDEOS</span>
+                                <span id="stat-videos" class="font-display font-bold text-2xl text-eva-green mt-1 block">0</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-eva-bg p-3 border border-eva-border space-y-2">
+                            <div class="flex justify-between font-mono text-[11px]">
+                                <span class="text-eva-muted">MELCHIOR-1 (SCIENCE)</span>
+                                <span class="text-eva-green">ONLINE</span>
+                            </div>
+                            <div class="flex justify-between font-mono text-[11px]">
+                                <span class="text-eva-muted">BALTHASAR-2 (MOTHER)</span>
+                                <span class="text-eva-green">ONLINE</span>
+                            </div>
+                            <div class="flex justify-between font-mono text-[11px]">
+                                <span class="text-eva-muted">CASPER-3 (WOMAN)</span>
+                                <span class="text-eva-orange">STANDBY</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 01: VIDEO ANALYSIS & EMBEDDED YOUTUBE THEATER -->
+        <section id="videos" class="py-14 sm:py-16 border-b border-eva-border">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                    <div>
+                        <div class="font-mono text-xs text-eva-orange uppercase tracking-widest mb-1">
+                            SECTION 01 // VISUAL ANALYSIS ARCHIVE
+                        </div>
+                        <h2 class="font-display font-bold text-2xl sm:text-3xl uppercase tracking-tight text-white">
+                            EVANGELION VIDEO BREAKDOWNS
+                        </h2>
+                    </div>
+                    <p class="font-mono text-xs text-eva-muted max-w-md">
+                        Watch curated lore essays or paste any YouTube URL below to broadcast it to the community player.
+                    </p>
+                </div>
+
+                <!-- Main Theater + Submit Form Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
+                    
+                    <!-- Left: Active Video Player (8 cols) -->
+                    <div class="lg:col-span-8 bg-eva-surface border border-eva-border flex flex-col">
+                        <div class="px-4 py-2.5 bg-eva-bg border-b border-eva-border flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 bg-eva-orange"></span>
+                                <span class="font-mono text-xs uppercase tracking-wider text-white truncate max-w-[240px] sm:max-w-md" id="active-video-tag">
+                                    NOW PLAYING // ARCHIVE STREAM
+                                </span>
+                            </div>
+                            <span class="font-mono text-[11px] text-eva-green" id="active-video-id-badge">ID: ---</span>
+                        </div>
+                        
+                        <!-- 16:9 Responsive Iframe Wrapper -->
+                        <div class="relative w-full aspect-video bg-black">
+                            <iframe 
+                                id="main-youtube-player"
+                                class="absolute inset-0 w-full h-full"
+                                src="" 
+                                title="Evangelion YouTube Video Player" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                referrerpolicy="strict-origin-when-cross-origin" 
+                                allowfullscreen>
+                            </iframe>
+                            <!-- Local File Protocol Warning Banner (Hidden on HTTP/HTTPS) -->
+                            <div id="local-protocol-warning" class="hidden absolute bottom-0 inset-x-0 bg-eva-bg/95 border-t border-eva-orange px-4 py-2.5 flex items-center justify-between gap-3">
+                                <span class="font-mono text-[11px] text-eva-orange">
+                                    [SYS_NOTE]: Running via local file:// — if YouTube displays Error 153, open via Live Server / GitHub Pages or click "OPEN ON YOUTUBE".
+                                </span>
+                                <button onclick="this.parentElement.remove()" class="font-mono text-xs text-white hover:text-eva-orange px-2">✕</button>
+                            </div>
+                        </div>
+
+                        <!-- Active Video Metadata -->
+                        <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-eva-border">
+                            <div>
+                                <h3 id="active-video-title" class="font-display font-bold text-lg sm:text-xl text-white">
+                                    Select a video from the archive
+                                </h3>
+                                <p id="active-video-meta" class="font-mono text-xs text-eva-muted mt-1">
+                                    SUBMITTED BY: NERV_COMMAND // CATEGORY: LORE ANALYSIS
+                                </p>
+                            </div>
+                            <a id="active-video-external" href="#" target="_blank" rel="noopener noreferrer" class="shrink-0 px-4 py-2.5 bg-eva-bg hover:bg-eva-elevated border border-eva-border hover:border-eva-orange font-mono text-xs text-white uppercase tracking-wider text-center transition-colors">
+                                OPEN ON YOUTUBE ↗
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Right: Submit Your YouTube Video Form (4 cols) -->
+                    <div class="lg:col-span-4 bg-eva-surface border border-eva-border p-5 sm:p-6 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-eva-border pb-3 mb-4">
+                                <span class="font-mono text-xs font-bold text-eva-orange uppercase tracking-wider">
+                                    + ADD YOUTUBE ANALYSIS
+                                </span>
+                                <span class="font-mono text-[10px] text-eva-muted">PUBLIC FEED</span>
+                            </div>
+                            
+                            <form id="video-submit-form" class="space-y-4">
+                                <div>
+                                    <label for="video-url" class="block font-mono text-[11px] uppercase text-eva-muted mb-1.5">
+                                        YOUTUBE VIDEO LINK *
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="video-url" 
+                                        placeholder="https://www.youtube.com/watch?v=..." 
+                                        required
+                                        class="w-full px-3.5 py-2.5 bg-eva-bg border border-eva-border text-white text-sm font-mono focus:outline-none focus:border-eva-orange placeholder:text-zinc-600"
+                                    >
+                                    <p class="font-mono text-[10px] text-eva-muted mt-1">
+                                        Supports youtube.com/watch?v=, youtu.be/, or /shorts/
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label for="video-title" class="block font-mono text-[11px] uppercase text-eva-muted mb-1.5">
+                                        ANALYSIS TITLE *
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="video-title" 
+                                        placeholder="e.g. Explaining the End of Evangelion" 
+                                        maxlength="90"
+                                        required
+                                        class="w-full px-3.5 py-2.5 bg-eva-bg border border-eva-border text-white text-sm focus:outline-none focus:border-eva-orange placeholder:text-zinc-600"
+                                    >
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
+                                    <div>
+                                        <label for="video-author" class="block font-mono text-[11px] uppercase text-eva-muted mb-1.5">
+                                            YOUR CALLSIGN
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            id="video-author" 
+                                            placeholder="Pilot_01" 
+                                            maxlength="24"
+                                            class="w-full px-3.5 py-2.5 bg-eva-bg border border-eva-border text-white text-sm font-mono focus:outline-none focus:border-eva-orange placeholder:text-zinc-600"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label for="video-category" class="block font-mono text-[11px] uppercase text-eva-muted mb-1.5">
+                                            TOPIC TAG
+                                        </label>
+                                        <select 
+                                            id="video-category"
+                                            class="w-full px-3.5 py-2.5 bg-eva-bg border border-eva-border text-white text-sm font-mono focus:outline-none focus:border-eva-orange"
+                                        >
+                                            <option value="LORE & SYMBOLISM">LORE & SYMBOLISM</option>
+                                            <option value="CHARACTER STUDY">CHARACTER STUDY</option>
+                                            <option value="REBUILD ANALYSIS">REBUILD ANALYSIS</option>
+                                            <option value="MECHA & TECH">MECHA & TECH</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button 
+                                    type="submit" 
+                                    class="w-full py-3.5 bg-eva-orange hover:bg-eva-orangeHover text-black font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                                >
+                                    UPLOAD TO SITE PLAYER
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="mt-5 pt-3 border-t border-eva-border font-mono text-[11px] text-eva-muted">
+                            * Added videos are saved to local archive and immediately playable on-site by visitors.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Playlist Grid -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="font-mono text-xs uppercase tracking-wider text-white">
+                            INDEXED TRANSMISSIONS (CLICK TO LOAD IN PLAYER)
+                        </span>
+                        <span id="video-count-label" class="font-mono text-xs text-eva-orange">0 ITEMS</span>
+                    </div>
+                    <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Dynamically populated by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 02: CHARACTER DOSSIERS & FACTS -->
+        <section id="characters" class="py-14 sm:py-16 border-b border-eva-border bg-eva-surface/40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header + Filter Controls -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                    <div>
+                        <div class="font-mono text-xs text-eva-green uppercase tracking-widest mb-1">
+                            SECTION 02 // CLASSIFIED PERSONNEL FILES
+                        </div>
+                        <h2 class="font-display font-bold text-2xl sm:text-3xl uppercase tracking-tight text-white">
+                            CHARACTERS & LORE FACTS
+                        </h2>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="flex flex-wrap gap-2" id="character-filters">
+                        <button onclick="filterCharacters('ALL')" data-filter="ALL" class="char-filter-btn px-3.5 py-2 bg-eva-orange text-black font-mono font-bold text-xs uppercase tracking-wider border border-eva-orange transition-colors">
+                            ALL FILES
+                        </button>
+                        <button onclick="filterCharacters('PILOT')" data-filter="PILOT" class="char-filter-btn px-3.5 py-2 bg-eva-bg text-eva-muted hover:text-white font-mono text-xs uppercase tracking-wider border border-eva-border transition-colors">
+                            EVA PILOTS
+                        </button>
+                        <button onclick="filterCharacters('NERV')" data-filter="NERV" class="char-filter-btn px-3.5 py-2 bg-eva-bg text-eva-muted hover:text-white font-mono text-xs uppercase tracking-wider border border-eva-border transition-colors">
+                            NERV COMMAND
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Character Cards Grid -->
+                <div id="character-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Dynamically populated by JS -->
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 03: COMMUNITY DISCUSSIONS (MAGI BOARD) -->
+        <section id="discussions" class="py-14 sm:py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                    <div>
+                        <div class="font-mono text-xs text-eva-orange uppercase tracking-widest mb-1">
+                            SECTION 03 // MAGI COMMUNICATIONS BOARD
+                        </div>
+                        <h2 class="font-display font-bold text-2xl sm:text-3xl uppercase tracking-tight text-white">
+                            FAN DISCUSSIONS & THEORIES
+                        </h2>
+                    </div>
+                    
+                    <!-- Topic Filter -->
+                    <div class="flex flex-wrap gap-2">
+                        <select id="discussion-filter-tag" onchange="renderDiscussions()" class="px-3.5 py-2 bg-eva-surface border border-eva-border text-white font-mono text-xs uppercase focus:outline-none focus:border-eva-orange">
+                            <option value="ALL">FILTER: ALL TOPICS</option>
+                            <option value="THEORY">TOPIC: LORE THEORY</option>
+                            <option value="CHARACTERS">TOPIC: CHARACTERS</option>
+                            <option value="REBUILD">TOPIC: REBUILD MOVIES</option>
+                            <option value="GENERAL">TOPIC: GENERAL</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Left: Post Composer (4 cols) -->
+                    <div class="lg:col-span-4">
+                        <div class="bg-eva-surface border border-eva-border p-5 sm:p-6 sticky top-24">
+                            <div class="flex items-center justify-between border-b border-eva-border pb-3 mb-4">
+                                <span class="font-mono text-xs font-bold text-white uppercase tracking-wider">
+                                    TRANSMIT MESSAGE
+                                </span>
+                                <span class="w-2 h-2 bg-eva-green"></span>
+                            </div>
+
+                            <form id="discussion-form" class="space-y-4">
+                                <div>
+                                    <label for="post-author" class="block font-mono text-[11px] uppercase text-eva-muted mb-1.5">
+                                        PILOT / AGENT NAME *
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="post-author" 
+                                        placeholder="e.g. Kaworu_Nagisa" 
+                                        maxlength="28"
+                                        required
+                                        class="w-full px-3.5 py-2.5 bg-eva-bg border border-eva-border text-white text-sm font-mono focus:outline-none focus:border-eva-orange placeholder:text-zinc-600"
+                                    >
+                                </div>
+
+                                <div>
+                                    <label for="post-tag" class="block font-mono text-[11px] uppercase text-eva-muted mb-1.5">
+                                        CLASSIFICATION TAG
+                                    </label>
+                                    <select 
+                                        id="post-tag"
+                                        class="w-full px-3.5 py-2.5 bg-eva-bg border border-eva-border text-white text-sm font-mono focus:outline-none focus:border-eva-orange"
+                                    >
+                                        <option value="THEORY">LORE THEORY</option>
+                                        <option value="CHARACTERS">CHARACTERS</option>
+                                        <option value="REBUILD">REBUILD MOVIES</option>
+                                        <option value="GENERAL">GENERAL</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="post-message" class="block font-mono text-[11px] uppercase text-eva-muted mb-1.5">
+                                        TRANSMISSION CONTENT *
+                                    </label>
+                                    <textarea 
+                                        id="post-message" 
+                                        rows="4" 
+                                        placeholder="Share your thoughts on the Human Instrumentality Project, favorite episode, or character psychology..." 
+                                        maxlength="600"
+                                        required
+                                        class="w-full px-3.5 py-2.5 bg-eva-bg border border-eva-border text-white text-sm focus:outline-none focus:border-eva-orange placeholder:text-zinc-600 resize-none"
+                                    ></textarea>
+                                    <div class="flex justify-end mt-1">
+                                        <span id="char-counter" class="font-mono text-[10px] text-eva-muted">0 / 600</span>
+                                    </div>
+                                </div>
+
+                                <button 
+                                    type="submit" 
+                                    class="w-full py-3.5 bg-eva-orange hover:bg-eva-orangeHover text-black font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                                >
+                                    PUBLISH TO BOARD
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Right: Discussion Feed (8 cols) -->
+                    <div class="lg:col-span-8 space-y-4" id="discussion-feed">
+                        <!-- Dynamically populated by JS -->
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-eva-surface border-t border-eva-border mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <div class="font-display font-bold text-lg tracking-wider uppercase text-white">
+                        EVAFAN <span class="text-eva-orange">//</span> TERMINAL
+                    </div>
+                    <p class="font-mono text-xs text-eva-muted mt-1">
+                        Fan-operated Evangelion archive. Neon Genesis Evangelion belongs to Khara / Gainax.
+                    </p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="resetDemoData()" class="font-mono text-[11px] text-eva-muted hover:text-eva-orange underline uppercase tracking-wider">
+                        RESET ARCHIVE DEFAULTS
+                    </button>
+                    <a href="#top" class="px-3 py-2 bg-eva-bg border border-eva-border hover:border-eva-orange font-mono text-xs text-white uppercase">
+                        TOP ↑
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="h-1.5 w-full hazard-bar"></div>
+    </footer>
+
+    <!-- Toast Notification Container (Replaces alert()) -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- Application Logic -->
+    <script>
+        // ==========================================
+        // 1. INITIAL ARCHIVE DATA & STATE
+        // ==========================================
+        const STORAGE_KEYS = {
+            VIDEOS: 'evafan_videos_v1',
+            POSTS: 'evafan_posts_v1',
+            ACTIVE_VIDEO: 'evafan_active_video_v1'
+        };
+
+        const DEFAULT_VIDEOS = [
+            {
+                id: 'v-101',
+                youtubeId: 'nU21rCWkuJw',
+                title: 'Neon Genesis Evangelion — Official Trailer (Netflix)',
+                author: 'NERV_ARCHIVE',
+                category: 'LORE & SYMBOLISM',
+                timestamp: 'ARCHIVED // VERIFIED'
+            },
+            {
+                id: 'v-102',
+                youtubeId: 'fShlVhCfHig',
+                title: 'A Cruel Angel’s Thesis — Opening Sequence Breakdown',
+                author: 'MAGI_01',
+                category: 'LORE & SYMBOLISM',
+                timestamp: 'ARCHIVED // VERIFIED'
+            },
+            {
+                id: 'v-103',
+                youtubeId: '10r9ozshGjg',
+                title: 'EVANGELION:3.0+1.01 THRICE UPON A TIME — Official Trailer',
+                author: 'DR_AKAGI',
+                category: 'REBUILD ANALYSIS',
+                timestamp: 'ARCHIVED // VERIFIED'
+            }
+        ];
+
+        const CHARACTERS_DATA = [
+            {
+                code: 'PILOT // 01',
+                name: 'SHINJI IKARI',
+                role: 'Third Child — Eva Unit-01',
+                group: 'PILOT',
+                accent: '#00FF66',
+                unit: 'EVA-01 TEST TYPE',
+                syncPeak: '400.0% (BERSERK)',
+                summary: 'Summoned to Tokyo-3 by his estranged father Gendo, Shinji pilots Unit-01 despite deep-seated fear of interpersonal rejection.',
+                facts: [
+                    'Plays the cello proficiently; learned it simply because nobody ever told him to stop.',
+                    'His SDAT cassette player perpetually loops Tracks 25 and 26, symbolizing his emotional stagnation.',
+                    'Unit-01 contains the soul of his mother, Yui Ikari, enabling autonomous protection.'
+                ]
+            },
+            {
+                code: 'PILOT // 00',
+                name: 'REI AYANAMI',
+                role: 'First Child — Eva Unit-00',
+                group: 'PILOT',
+                accent: '#38BDF8',
+                unit: 'EVA-00 PROTOTYPE',
+                syncPeak: '84.2%',
+                summary: 'An enigmatic, detached pilot whose existence is tied directly to the origins of Lilith and the Human Instrumentality Project.',
+                facts: [
+                    'Created from the salvaged remains of Yui Ikari combined with the soul of the Second Angel, Lilith.',
+                    'Strictly vegetarian; she once declined meat at a celebratory ramen dinner.',
+                    'Keeps Gendo Ikari’s cracked glasses in her sparse apartment as her sole personal attachment.'
+                ]
+            },
+            {
+                code: 'PILOT // 02',
+                name: 'ASUKA LANGLEY SORYU',
+                role: 'Second Child — Eva Unit-02',
+                group: 'PILOT',
+                accent: '#FF5500',
+                unit: 'EVA-02 PRODUCTION',
+                syncPeak: '96.8%',
+                summary: 'A fierce prodigy trained in Germany who masks profound childhood trauma behind aggressive perfectionism and pride.',
+                facts: [
+                    'Graduated from university at age 14 before relocating to NERV Headquarters in Japan.',
+                    'Her A10 nerve clips are worn even outside combat as part of her core identity as an Eva pilot.',
+                    'Unit-02 houses the maternal aspect of her mother Kyoko’s soul.'
+                ]
+            },
+            {
+                code: 'CMD // OPS',
+                name: 'MISATO KATSURAGI',
+                role: 'Captain / Tactical Operations Director',
+                group: 'NERV',
+                accent: '#A855F7',
+                unit: 'TACTICAL COMMAND',
+                syncPeak: 'N/A (HUMAN)',
+                summary: 'Sole survivor of the Katsuragi Expedition at Second Impact, she commands NERV’s field operations while acting as guardian to Shinji and Asuka.',
+                facts: [
+                    'Bears a prominent chest scar sustained when her father placed her in an escape capsule during Second Impact.',
+                    'Pen-Pen, her warm-water penguin roommate, was saved from euthanasia at a genetics lab.',
+                    'Designed many of the high-risk, low-probability defensive operations against the Angels.'
+                ]
+            },
+            {
+                code: 'PILOT // 05',
+                name: 'KAWORU NAGISA',
+                role: 'Fifth Child / Tabris (17th Angel)',
+                group: 'PILOT',
+                accent: '#F43F5E',
+                unit: 'EVA-02 OVERRIDE',
+                syncPeak: 'UNLIMITED',
+                summary: 'Sent by SEELE as a replacement pilot, Kaworu is the vessel of Adam’s soul who offers Shinji unconditional acceptance.',
+                facts: [
+                    'Can synchronize with any Adam-based Evangelion unit at arbitrary levels without entering the entry plug.',
+                    'Born on September 13, 2000 — the exact day Second Impact occurred in Antarctica.',
+                    'Hums Beethoven’s Symphony No. 9 ("Ode to Joy") upon his arrival at Terminal Dogma.'
+                ]
+            },
+            {
+                code: 'CMD // SUP',
+                name: 'GENDO IKARI',
+                role: 'Supreme Commander of NERV',
+                group: 'NERV',
+                accent: '#EAB308',
+                unit: 'PROJECT E-01',
+                syncPeak: 'N/A (HUMAN)',
+                summary: 'Cold, calculating architect of NERV’s survival strategies who secretly subverts SEELE’s scenario to reunite with Yui.',
+                facts: [
+                    'Originally named Gendo Rokubungi before taking his wife Yui’s surname after marriage.',
+                    'The burns on his hands were sustained while rescuing Rei from Unit-00’s berserk activation test.',
+                    'Developed the Dummy Plug system based on Rei Ayanami’s personality matrix.'
+                ]
+            }
+        ];
+
+        const DEFAULT_POSTS = [
+            {
+                id: 'p-1',
+                author: 'UNIT01_PILOT',
+                tag: 'THEORY',
+                message: 'Rewatching Episode 19: The moment Unit-01 consumes the S2 Engine from Zeruel is the true point of no return. NERV loses control over their own weapon, and SEELE realizes Gendo is building a god.',
+                timestamp: '2 HOURS AGO',
+                likes: 14,
+                liked: false
+            },
+            {
+                id: 'p-2',
+                author: 'MAGI_CASPER',
+                tag: 'CHARACTERS',
+                message: 'People often overlook how much Misato mirrors Shinji. Both crave validation from distant fathers and use external roles (piloting vs. NERV tactics) to avoid intimacy.',
+                timestamp: '5 HOURS AGO',
+                likes: 21,
+                liked: false
+            },
+            {
+                id: 'p-3',
+                author: 'TOKYO3_ARCHIVIST',
+                tag: 'REBUILD',
+                message: 'Just uploaded a video breakdown in Section 01! The transition from cel animation in 1995 to the Anti-Universe in 3.0+1.0 shows Anno literally deconstructing the medium itself.',
+                timestamp: '1 DAY AGO',
+                likes: 9,
+                liked: false
+            }
+        ];
+
+        // State Variables
+        let videos = [];
+        let posts = [];
+        let activeVideoId = null;
+        let currentCharFilter = 'ALL';
+
+        // ==========================================
+        // 2. INITIALIZATION & LOCALSTORAGE SYNC
+        // ==========================================
+        function initApp() {
+            try {
+                const savedVideos = localStorage.getItem(STORAGE_KEYS.VIDEOS);
+                videos = savedVideos ? JSON.parse(savedVideos) : [...DEFAULT_VIDEOS];
+                if (!Array.isArray(videos) || videos.length === 0) videos = [...DEFAULT_VIDEOS];
+
+                const savedPosts = localStorage.getItem(STORAGE_KEYS.POSTS);
+                posts = savedPosts ? JSON.parse(savedPosts) : [...DEFAULT_POSTS];
+                if (!Array.isArray(posts)) posts = [...DEFAULT_POSTS];
+
+                const savedActiveVideo = localStorage.getItem(STORAGE_KEYS.ACTIVE_VIDEO);
+                activeVideoId = savedActiveVideo && videos.some(v => v.id === savedActiveVideo)
+                    ? savedActiveVideo
+                    : videos[0].id;
+            } catch (e) {
+                videos = [...DEFAULT_VIDEOS];
+                posts = [...DEFAULT_POSTS];
+                activeVideoId = videos[0].id;
+            }
+
+            renderVideos();
+            loadVideoIntoPlayer(activeVideoId, false);
+            renderCharacters();
+            renderDiscussions();
+            updateStats();
+            setupEventListeners();
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEYS.VIDEOS, JSON.stringify(videos));
+                localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(posts));
+                if (activeVideoId) {
+                    localStorage.setItem(STORAGE_KEYS.ACTIVE_VIDEO, activeVideoId);
+                }
+            } catch (e) {
+                showToast('WARNING: Local storage quota exceeded.', 'error');
+            }
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('stat-posts').textContent = String(posts.length).padStart(2, '0');
+            document.getElementById('stat-videos').textContent = String(videos.length).padStart(2, '0');
+            document.getElementById('video-count-label').textContent = `${videos.length} ITEMS`;
+        }
+
+        // ==========================================
+        // 3. YOUTUBE URL PARSER & VIDEO THEATER
+        // ==========================================
+        function extractYouTubeId(url) {
+            if (!url || typeof url !== 'string') return null;
+            const trimmed = url.trim();
+            // Direct 11-char ID check
+            if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+
+            const regExp = /(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/|live\/)|youtu\.be\/|youtube-nocookie\.com\/embed\/)([a-zA-Z0-9_-]{11})/;
+            const match = trimmed.match(regExp);
+            return match ? match[1] : null;
+        }
+
+        function handleThumbError(imgEl, youtubeId) {
+            // Step 1: Fallback from mqdefault to standard default thumbnail
+            if (!imgEl.dataset.fallbackTried) {
+                imgEl.dataset.fallbackTried = '1';
+                imgEl.src = `https://i.ytimg.com/vi/${youtubeId}/default.jpg`;
+                return;
+            }
+            // Step 2: Render clean NERV tactical SVG placeholder if YouTube images are unreachable
+            imgEl.onerror = null;
+            const svgFallback = `data:image/svg+xml;utf8,` + encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+                    <rect width="640" height="360" fill="#111114"/>
+                    <rect x="16" y="16" width="608" height="328" fill="none" stroke="#FF5500" stroke-width="2"/>
+                    <text x="320" y="168" fill="#FF5500" font-family="monospace" font-size="22" font-weight="bold" text-anchor="middle">MAGI VISUAL STREAM</text>
+                    <text x="320" y="198" fill="#A1A1AA" font-family="monospace" font-size="14" text-anchor="middle">YT_ID: ${youtubeId}</text>
+                </svg>
+            `);
+            imgEl.src = svgFallback;
+        }
+
+        function loadVideoIntoPlayer(videoId, scrollToPlayer = true) {
+            const video = videos.find(v => v.id === videoId) || videos[0];
+            if (!video) return;
+
+            activeVideoId = video.id;
+            saveState();
+
+            const iframe = document.getElementById('main-youtube-player');
+            const titleEl = document.getElementById('active-video-title');
+            const metaEl = document.getElementById('active-video-meta');
+            const tagEl = document.getElementById('active-video-tag');
+            const badgeEl = document.getElementById('active-video-id-badge');
+            const extLink = document.getElementById('active-video-external');
+            const localWarning = document.getElementById('local-protocol-warning');
+
+            if (window.location.protocol === 'file:' && localWarning) {
+                localWarning.classList.remove('hidden');
+            }
+
+            // Standard youtube.com/embed with origin param when hosted over HTTP/HTTPS
+            const originParam = window.location.origin && window.location.origin !== 'null'
+                ? `&origin=${encodeURIComponent(window.location.origin)}`
+                : '';
+            iframe.src = `https://www.youtube.com/embed/${video.youtubeId}?rel=0&modestbranding=1${originParam}`;
+            titleEl.textContent = video.title;
+            metaEl.textContent = `SUBMITTED BY: ${video.author} // CATEGORY: ${video.category}`;
+            tagEl.textContent = `NOW PLAYING // ${video.category}`;
+            badgeEl.textContent = `YT_ID: ${video.youtubeId}`;
+            extLink.href = `https://www.youtube.com/watch?v=${video.youtubeId}`;
+
+            renderVideos();
+
+            if (scrollToPlayer) {
+                document.getElementById('videos').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function renderVideos() {
+            const grid = document.getElementById('video-grid');
+            if (videos.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-eva-surface border border-eva-border p-8 text-center">
+                        <p class="font-mono text-xs text-eva-muted uppercase">NO VIDEO TRANSMISSIONS FOUND IN ARCHIVE.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = videos.map(video => {
+                const isActive = video.id === activeVideoId;
+                const thumbUrl = `https://i.ytimg.com/vi/${video.youtubeId}/mqdefault.jpg`;
+                const isUserAdded = !video.id.startsWith('v-10');
+
+                return `
+                    <div class="group bg-eva-surface border ${isActive ? 'border-eva-orange' : 'border-eva-border hover:border-eva-orange'} transition-all flex flex-col justify-between">
+                        <div>
+                            <!-- Thumbnail Clickable Area -->
+                            <div onclick="loadVideoIntoPlayer('${video.id}', true)" class="relative aspect-video bg-black overflow-hidden cursor-pointer border-b border-eva-border">
+                                <img 
+                                    src="${thumbUrl}" 
+                                    alt="${escapeHtml(video.title)}" 
+                                    loading="lazy"
+                                    onerror="handleThumbError(this, '${video.youtubeId}')"
+                                    class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-300"
+                                >
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                                
+                                <!-- Status Badge -->
+                                <div class="absolute top-2 left-2 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${isActive ? 'bg-eva-orange text-black font-bold' : 'bg-black/80 text-white border border-eva-border'}">
+                                    ${isActive ? '● ACTIVE STREAM' : video.category}
+                                </div>
+
+                                <!-- Play Overlay Square -->
+                                <div class="absolute bottom-2 right-2 w-9 h-9 bg-eva-orange text-black flex items-center justify-center font-mono font-bold text-xs group-hover:bg-eva-green transition-colors">
+                                    ▶
+                                </div>
+                            </div>
+
+                            <!-- Card Content -->
+                            <div class="p-4">
+                                <h4 onclick="loadVideoIntoPlayer('${video.id}', true)" class="font-display font-bold text-base text-white group-hover:text-eva-orange transition-colors cursor-pointer line-clamp-2 leading-snug">
+                                    ${escapeHtml(video.title)}
+                                </h4>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="px-4 py-2.5 bg-eva-bg border-t border-eva-border flex items-center justify-between">
+                            <span class="font-mono text-[11px] text-eva-muted truncate">
+                                BY: ${escapeHtml(video.author)}
+                            </span>
+                            ${isUserAdded ? `
+                                <button onclick="deleteVideo('${video.id}')" title="Remove Video" class="font-mono text-[10px] text-eva-muted hover:text-red-500 uppercase tracking-wider px-1.5 py-0.5 border border-transparent hover:border-red-500/40">
+                                    [DEL]
+                                </button>
+                            ` : `
+                                <span class="font-mono text-[10px] text-eva-green">VERIFIED</span>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteVideo(videoId) {
+            videos = videos.filter(v => v.id !== videoId);
+            if (videos.length === 0) {
+                videos = [...DEFAULT_VIDEOS];
+            }
+            if (activeVideoId === videoId) {
+                activeVideoId = videos[0].id;
+                loadVideoIntoPlayer(activeVideoId, false);
+            } else {
+                saveState();
+                renderVideos();
+            }
+            showToast('Video transmission removed from archive.', 'info');
+        }
+
+        // ==========================================
+        // 4. CHARACTER DOSSIERS RENDERER
+        // ==========================================
+        function filterCharacters(group) {
+            currentCharFilter = group;
+            
+            // Update filter button styles
+            document.querySelectorAll('.char-filter-btn').forEach(btn => {
+                if (btn.dataset.filter === group) {
+                    btn.className = 'char-filter-btn px-3.5 py-2 bg-eva-orange text-black font-mono font-bold text-xs uppercase tracking-wider border border-eva-orange transition-colors';
+                } else {
+                    btn.className = 'char-filter-btn px-3.5 py-2 bg-eva-bg text-eva-muted hover:text-white font-mono text-xs uppercase tracking-wider border border-eva-border transition-colors';
+                }
+            });
+
+            renderCharacters();
+        }
+
+        function renderCharacters() {
+            const grid = document.getElementById('character-grid');
+            const filtered = currentCharFilter === 'ALL' 
+                ? CHARACTERS_DATA 
+                : CHARACTERS_DATA.filter(c => c.group === currentCharFilter);
+
+            grid.innerHTML = filtered.map((char, idx) => `
+                <article class="bg-eva-bg border border-eva-border hover:border-eva-orange transition-colors flex flex-col justify-between fade-in">
+                    <div>
+                        <!-- Top Color Bar -->
+                        <div class="h-1 w-full" style="background-color: ${char.accent};"></div>
+                        
+                        <div class="p-5 sm:p-6">
+                            <!-- Dossier Header -->
+                            <div class="flex items-center justify-between font-mono text-[11px] text-eva-muted mb-2">
+                                <span style="color: ${char.accent};" class="font-bold tracking-wider">${char.code}</span>
+                                <span>${char.unit}</span>
+                            </div>
+
+                            <h3 class="font-display font-bold text-xl sm:text-2xl text-white uppercase tracking-tight">
+                                ${char.name}
+                            </h3>
+                            <p class="font-mono text-xs text-eva-orange mt-0.5 mb-4">
+                                ${char.role}
+                            </p>
+
+                            <p class="text-sm text-eva-muted leading-relaxed mb-5">
+                                ${char.summary}
+                            </p>
+
+                            <!-- Declassified Facts List -->
+                            <div class="border-t border-eva-border pt-4">
+                                <span class="font-mono text-[10px] uppercase tracking-widest text-white block mb-2.5">
+                                    DECLASSIFIED LORE FACTS:
+                                </span>
+                                <ul class="space-y-2.5">
+                                    ${char.facts.map(fact => `
+                                        <li class="flex items-start gap-2.5 text-xs text-zinc-300 leading-relaxed">
+                                            <span class="font-mono text-eva-orange font-bold mt-0.5">▪</span>
+                                            <span>${fact}</span>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Telemetry Footer -->
+                    <div class="px-5 py-3 bg-eva-surface border-t border-eva-border flex items-center justify-between font-mono text-[11px]">
+                        <span class="text-eva-muted">MAX SYNC:</span>
+                        <span class="text-white font-bold">${char.syncPeak}</span>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // ==========================================
+        // 5. COMMUNITY DISCUSSIONS BOARD
+        // ==========================================
+        function renderDiscussions() {
+            const feed = document.getElementById('discussion-feed');
+            const filterTag = document.getElementById('discussion-filter-tag').value;
+
+            const filteredPosts = filterTag === 'ALL'
+                ? posts
+                : posts.filter(p => p.tag === filterTag);
+
+            if (filteredPosts.length === 0) {
+                feed.innerHTML = `
+                    <div class="bg-eva-surface border border-eva-border p-10 text-center">
+                        <div class="font-mono text-xs text-eva-orange uppercase tracking-widest mb-2">
+                            NO TRANSMISSIONS IN THIS SECTOR
+                        </div>
+                        <p class="text-sm text-eva-muted">
+                            Be the first agent to transmit a message under [${filterTag}].
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            feed.innerHTML = filteredPosts.map(post => {
+                const isUserPost = !post.id.startsWith('p-');
+                return `
+                    <div class="bg-eva-surface border border-eva-border p-5 hover:border-zinc-600 transition-colors fade-in">
+                        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-eva-border">
+                            <div class="flex items-center gap-2.5">
+                                <span class="px-2 py-0.5 bg-eva-bg border border-eva-orange text-eva-orange font-mono text-[10px] font-bold uppercase tracking-wider">
+                                    ${escapeHtml(post.tag)}
+                                </span>
+                                <span class="font-mono text-xs font-bold text-white">
+                                    @${escapeHtml(post.author)}
+                                </span>
+                            </div>
+                            <span class="font-mono text-[11px] text-eva-muted">
+                                ${escapeHtml(post.timestamp)}
+                            </span>
+                        </div>
+
+                        <p class="text-sm sm:text-base text-zinc-200 leading-relaxed whitespace-pre-line mb-4">
+                            ${escapeHtml(post.message)}
+                        </p>
+
+                        <div class="flex items-center justify-between pt-2">
+                            <button 
+                                onclick="toggleLikePost('${post.id}')" 
+                                class="px-3 py-1.5 font-mono text-xs border transition-colors flex items-center gap-2 cursor-pointer ${post.liked ? 'bg-eva-green/10 border-eva-green text-eva-green' : 'bg-eva-bg border-eva-border text-eva-muted hover:text-white hover:border-eva-orange'}"
+                            >
+                                <span>▲ SYNC / UPVOTE</span>
+                                <span class="font-bold">[${post.likes}]</span>
+                            </button>
+
+                            ${isUserPost ? `
+                                <button onclick="deletePost('${post.id}')" class="font-mono text-[11px] text-eva-muted hover:text-red-500 uppercase tracking-wider px-2 py-1">
+                                    DELETE TRANSMISSION
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleLikePost(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+
+            post.liked = !post.liked;
+            post.likes += post.liked ? 1 : -1;
+            saveState();
+            renderDiscussions();
+        }
+
+        function deletePost(postId) {
+            posts = posts.filter(p => p.id !== postId);
+            saveState();
+            renderDiscussions();
+            showToast('Transmission deleted from MAGI board.', 'info');
+        }
+
+        // ==========================================
+        // 6. EVENT LISTENERS & FORM SUBMISSIONS
+        // ==========================================
+        function setupEventListeners() {
+            // Video Submission Form
+            document.getElementById('video-submit-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const urlInput = document.getElementById('video-url');
+                const titleInput = document.getElementById('video-title');
+                const authorInput = document.getElementById('video-author');
+                const categoryInput = document.getElementById('video-category');
+
+                const youtubeId = extractYouTubeId(urlInput.value);
+                if (!youtubeId) {
+                    showToast('INVALID URL: Please enter a valid YouTube video link.', 'error');
+                    urlInput.focus();
+                    return;
+                }
+
+                const cleanTitle = titleInput.value.trim();
+                if (!cleanTitle) {
+                    showToast('TITLE REQUIRED: Please name your video breakdown.', 'error');
+                    titleInput.focus();
+                    return;
+                }
+
+                const cleanAuthor = (authorInput.value.trim() || 'ANONYMOUS_PILOT').toUpperCase().replace(/\s+/g, '_');
+
+                const newVideo = {
+                    id: 'user-vid-' + Date.now(),
+                    youtubeId: youtubeId,
+                    title: cleanTitle,
+                    author: cleanAuthor,
+                    category: categoryInput.value,
+                    timestamp: 'JUST NOW'
+                };
+
+                videos.unshift(newVideo);
+                saveState();
+                loadVideoIntoPlayer(newVideo.id, false);
+
+                // Reset form
+                urlInput.value = '';
+                titleInput.value = '';
+                showToast('Video uploaded and loaded into the active player.', 'success');
+            });
+
+            // Discussion Post Submission Form
+            document.getElementById('discussion-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const authorInput = document.getElementById('post-author');
+                const tagInput = document.getElementById('post-tag');
+                const messageInput = document.getElementById('post-message');
+
+                const author = authorInput.value.trim().replace(/\s+/g, '_');
+                const message = messageInput.value.trim();
+
+                if (!author || !message) {
+                    showToast('Please enter both your callsign and message.', 'error');
+                    return;
+                }
+
+                const newPost = {
+                    id: 'user-post-' + Date.now(),
+                    author: author,
+                    tag: tagInput.value,
+                    message: message,
+                    timestamp: 'JUST NOW',
+                    likes: 1,
+                    liked: true
+                };
+
+                posts.unshift(newPost);
+                saveState();
+
+                // Reset filter to ALL so user sees their post immediately
+                document.getElementById('discussion-filter-tag').value = 'ALL';
+                renderDiscussions();
+
+                messageInput.value = '';
+                document.getElementById('char-counter').textContent = '0 / 600';
+                showToast('Transmission published to MAGI board.', 'success');
+            });
+
+            // Character Counter for Discussion Textarea
+            document.getElementById('post-message').addEventListener('input', function() {
+                document.getElementById('char-counter').textContent = `${this.value.length} / 600`;
+            });
+        }
+
+        // ==========================================
+        // 7. UTILITIES & UI HELPERS
+        // ==========================================
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function resetDemoData() {
+            localStorage.removeItem(STORAGE_KEYS.VIDEOS);
+            localStorage.removeItem(STORAGE_KEYS.POSTS);
+            localStorage.removeItem(STORAGE_KEYS.ACTIVE_VIDEO);
+            videos = [...DEFAULT_VIDEOS];
+            posts = [...DEFAULT_POSTS];
+            activeVideoId = videos[0].id;
+            saveState();
+            renderVideos();
+            loadVideoIntoPlayer(activeVideoId, false);
+            renderDiscussions();
+            showToast('Archive restored to factory MAGI defaults.', 'info');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let borderColor = 'border-eva-green';
+            let badgeText = 'OK';
+            let badgeColor = 'text-eva-green';
+
+            if (type === 'error') {
+                borderColor = 'border-eva-orange';
+                badgeText = 'ERR';
+                badgeColor = 'text-eva-orange';
+            } else if (type === 'info') {
+                borderColor = 'border-zinc-500';
+                badgeText = 'SYS';
+                badgeColor = 'text-white';
+            }
+
+            toast.className = `pointer-events-auto bg-eva-surface border-l-4 ${borderColor} border-t border-r border-b border-eva-border p-3.5 shadow-2xl flex items-start gap-3 fade-in`;
+            toast.innerHTML = `
+                <span class="font-mono text-xs font-bold ${badgeColor}">[${badgeText}]</span>
+                <span class="font-mono text-xs text-white leading-snug">${escapeHtml(message)}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.25s ease';
+                setTimeout(() => toast.remove(), 250);
+            }, 3500);
+        }
+
+        // Boot application on load
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
